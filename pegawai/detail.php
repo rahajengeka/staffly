@@ -1,303 +1,246 @@
 <?php
-/**
- * pegawai/detail.php
- * Halaman Detail Informasi Satu Pegawai - Tema "Creatix Digital Studio & HR Engine"
- * Skema Junior Web Developer - BNSP SKK-32-10/2024
- */
-
-session_start();
-
-// Guard: wajib login
-if (!isset($_SESSION['user_id'])) {
-    header('Location: ../login.php');
-    exit;
-}
-
 require_once '../config/koneksi.php';
+requireAuth('../login.php');
 
-// ---- Ambil & validasi parameter ID ----
-$idPegawai = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-if (!$idPegawai || $idPegawai <= 0) {
-    $_SESSION['flash_error'] = 'ID pegawai tidak valid.';
-    header('Location: index.php');
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+if (!$id) {
+    header('Location: ./index.php');
     exit;
 }
 
-try {
-    $stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan, no_telepon, created_at FROM employees WHERE id = :id LIMIT 1');
-    $stmt->execute([':id' => $idPegawai]);
-    $dataPegawai = $stmt->fetch();
-} catch (PDOException $e) {
-    error_log('Detail query error: ' . $e->getMessage());
-    $_SESSION['flash_error'] = 'Terjadi kesalahan saat mengambil data.';
-    header('Location: index.php');
+$stmt = $pdo->prepare("SELECT * FROM employees WHERE id = :id");
+$stmt->execute([':id' => $id]);
+$employee = $stmt->fetch();
+
+if (!$employee) {
+    header('Location: ./index.php');
     exit;
-}
-
-if (!$dataPegawai) {
-    $_SESSION['flash_error'] = 'Data pegawai tidak ditemukan.';
-    header('Location: index.php');
-    exit;
-}
-
-$namaAdmin = htmlspecialchars($_SESSION['nama_lengkap'], ENT_QUOTES, 'UTF-8');
-
-function safeHtml(string $value): string {
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 ?>
-<!DOCTYPE html>
-<html lang="id">
+<!doctype html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="base-path" content="../">
-    <title>Profil: <?= safeHtml($dataPegawai['nama']) ?> &mdash; Creatix HR Engine</title>
+    <title>Staffly — <?= e($employee['nama']) ?></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css?v=7">
 
-    <!-- Google Fonts: Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <!-- Bootstrap 5 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Custom Creatix Theme CSS -->
-    <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-<body class="d-flex flex-column min-vh-100">
-
-<!-- Loading Overlay -->
-<div id="loadingOverlay">
-    <div class="text-center bg-dark p-4 rounded-4 border border-secondary shadow-lg">
-        <div class="spinner-border text-success" style="width:2.5rem;height:2.5rem;" role="status">
-            <span class="visually-hidden">Memuat...</span>
-        </div>
-        <p class="mt-3 mb-0 text-white fw-bold small">Menghapus data pegawai...</p>
-    </div>
-</div>
-
-<!-- ==================== TOP STRIP ==================== -->
-<div class="creatix-topstrip">
-    <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
-        <div class="d-flex align-items-center gap-2">
-            <span class="neon-dot"></span>
-            <span>FR-06 Rincian Detail Profil Pegawai &bull; Standar BNSP JWD</span>
-        </div>
-        <div class="d-flex align-items-center gap-3">
-            <span><i class="bi bi-person-circle me-1"></i> Sesi: <strong><?= $namaAdmin ?></strong></span>
-            <span>&bull;</span>
-            <a href="../logout.php" onclick="return confirm('Yakin ingin keluar?')" class="text-decoration-none text-light opacity-75 hover-opacity-100">
-                Logout <i class="bi bi-box-arrow-right"></i>
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- ==================== NAVBAR ==================== -->
-<nav class="navbar navbar-expand-lg creatix-navbar sticky-top">
-    <div class="container">
-        <a class="creatix-brand" href="../dashboard.php">
-            <span class="text-white">CREATIX</span>
-            <span class="creatix-brand-badge">HR ENGINE</span>
-        </a>
-
-        <button class="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCreatix">
-            <i class="bi bi-list fs-2 text-white"></i>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarCreatix">
-            <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1">
-                <li class="nav-item">
-                    <a class="creatix-nav-link" href="../dashboard.php">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="creatix-nav-link active" href="index.php">Daftar Pegawai</a>
-                </li>
-                <li class="nav-item">
-                    <a class="creatix-nav-link" href="tambah.php">Input Baru</a>
-                </li>
-            </ul>
-
-            <div class="d-flex align-items-center gap-2">
-                <a href="index.php" class="btn-creatix-dark">
-                    Lihat Daftar &rarr;
-                </a>
-            </div>
-        </div>
-    </div>
-</nav>
-
-<!-- ==================== MAIN CONTENT ==================== -->
-<main class="container py-4 flex-grow-1">
-
-    <div id="alertContainer"></div>
-
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb small">
-            <li class="breadcrumb-item"><a href="../dashboard.php" class="text-decoration-none" style="color:var(--creatix-neon)">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="index.php" class="text-decoration-none" style="color:var(--creatix-neon)">Data Pegawai</a></li>
-            <li class="breadcrumb-item active text-muted" aria-current="page">Detail: <?= safeHtml($dataPegawai['nama']) ?></li>
-        </ol>
-    </nav>
-
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="creatix-table-card overflow-hidden">
-
-                <!-- Header Profil Creatix -->
-                <div class="p-4 p-md-5" style="background-color: var(--creatix-dark); border-bottom: 1px solid var(--creatix-border);">
-                    <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-4">
-                        <div class="rounded-4 d-flex align-items-center justify-content-center fw-bold shadow" 
-                             style="width: 80px; height: 80px; background-color: var(--creatix-neon); color: #000000; font-size: 2.2rem; flex-shrink: 0;">
-                            <?= strtoupper(substr($dataPegawai['nama'], 0, 1)) ?>
-                        </div>
-                        <div>
-                            <span class="text-uppercase fw-bold small" style="color:var(--creatix-neon); letter-spacing:0.08em;">PROFIL LENGKAP PEGAWAI</span>
-                            <h2 class="fw-bold text-white mb-1 mt-1" style="letter-spacing: -0.02em;">
-                                <?= safeHtml($dataPegawai['nama']) ?>
-                            </h2>
-                            <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
-                                <span class="badge-creatix-role">
-                                    <?= safeHtml($dataPegawai['jabatan']) ?>
-                                </span>
-                                <span class="badge-creatix-nip">
-                                    NIP: <?= safeHtml($dataPegawai['nip']) ?>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Body Rincian Informasi -->
-                <div class="p-4 p-md-5" style="background-color: var(--creatix-card);">
-                    <h5 class="fw-bold text-white mb-4 pb-2 border-bottom border-secondary">
-                        <i class="bi bi-info-circle-fill me-2" style="color:var(--creatix-neon)"></i> Rincian Identitas Pegawai
-                    </h5>
-
-                    <div class="row g-4">
-                        <div class="col-sm-6">
-                            <div class="p-3 rounded-3" style="background-color: var(--creatix-dark); border: 1px solid var(--creatix-border);">
-                                <div class="text-muted small fw-bold text-uppercase" style="letter-spacing:0.05em;">Nomor Induk Pegawai</div>
-                                <div class="fw-bold fs-6 mt-1 text-white" style="font-family:monospace;">
-                                    <?= safeHtml($dataPegawai['nip']) ?>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <div class="p-3 rounded-3" style="background-color: var(--creatix-dark); border: 1px solid var(--creatix-border);">
-                                <div class="text-muted small fw-bold text-uppercase" style="letter-spacing:0.05em;">Jabatan / Posisi</div>
-                                <div class="fw-bold fs-6 mt-1 text-white">
-                                    <?= safeHtml($dataPegawai['jabatan']) ?>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <div class="p-3 rounded-3" style="background-color: var(--creatix-dark); border: 1px solid var(--creatix-border);">
-                                <div class="text-muted small fw-bold text-uppercase" style="letter-spacing:0.05em;">Email Resmi Perusahaan</div>
-                                <div class="fw-bold fs-6 mt-1">
-                                    <a href="mailto:<?= safeHtml($dataPegawai['email']) ?>" class="text-decoration-none" style="color:var(--creatix-neon);">
-                                        <i class="bi bi-envelope me-1"></i> <?= safeHtml($dataPegawai['email']) ?>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <div class="p-3 rounded-3" style="background-color: var(--creatix-dark); border: 1px solid var(--creatix-border);">
-                                <div class="text-muted small fw-bold text-uppercase" style="letter-spacing:0.05em;">Nomor WhatsApp / Kontak</div>
-                                <div class="fw-bold fs-6 mt-1 text-white">
-                                    <?php if ($dataPegawai['no_telepon']): ?>
-                                    <a href="tel:<?= safeHtml($dataPegawai['no_telepon']) ?>" class="text-decoration-none text-white">
-                                        <i class="bi bi-whatsapp me-1 text-success"></i> <?= safeHtml($dataPegawai['no_telepon']) ?>
-                                    </a>
-                                    <?php else: ?>
-                                    <span class="text-muted fst-italic">Belum dicatat</span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <div class="p-3 rounded-3" style="background-color: var(--creatix-dark); border: 1px solid var(--creatix-border);">
-                                <div class="text-muted small fw-bold text-uppercase" style="letter-spacing:0.05em;">Waktu Terdaftar di Sistem</div>
-                                <div class="fw-bold fs-6 mt-1 text-white">
-                                    <i class="bi bi-calendar-event me-1" style="color:var(--creatix-neon);"></i>
-                                    <?= date('d F Y, H:i', strtotime($dataPegawai['created_at'])) ?> WIB
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tombol Aksi Creatix -->
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 pt-4 mt-4 border-top border-secondary">
-                        <a href="index.php" class="btn-creatix-dark">
-                            &larr; Kembali ke Daftar
-                        </a>
-                        <div class="d-flex gap-2">
-                            <a href="edit.php?id=<?= (int)$dataPegawai['id'] ?>" class="btn-creatix-neon">
-                                <i class="bi bi-pencil"></i> Ubah Data
-                            </a>
-                            <button type="button" class="btn btn-outline-danger rounded-pill px-4" onclick="hapusDetailPegawai(<?= (int)$dataPegawai['id'] ?>)">
-                                <i class="bi bi-trash"></i> Hapus Pegawai
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-</main>
-
-<!-- ==================== FOOTER ==================== -->
-<footer class="creatix-footer">
-    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-        <div class="d-flex align-items-center gap-2">
-            <strong class="text-white">CREATIX</strong>
-            <span class="creatix-brand-badge">HR ENGINE</span>
-            <span class="text-muted">&bull; Skema Sertifikasi Junior Web Developer</span>
-        </div>
-        <div class="text-center text-md-end small">
-            Dokumen Acuan <strong>FR.IA.02</strong> &bull; Pemrograman Terstruktur PHP &amp; MySQL
-        </div>
-    </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="../assets/js/script.js"></script>
-<script>
-function hapusDetailPegawai(id) {
-    if (!confirm('Apakah Anda yakin ingin menghapus data pegawai ini?\nTindakan ini tidak dapat dibatalkan.')) {
-        return;
-    }
-
-    showLoading();
-
-    $.ajax({
-        url: '../proses/proses_hapus.php',
-        method: 'POST',
-        data: { id: id },
-        dataType: 'json',
-        success: function(res) {
-            hideLoading();
-            if (res.status === 'success') {
-                window.location.href = 'index.php';
-            } else {
-                alert(res.message || 'Gagal menghapus data.');
-            }
-        },
-        error: function() {
-            hideLoading();
-            alert('Terjadi kesalahan pada server.');
+    <style>
+        :root {
+            --brand-black: #0c0d0e;
+            --brand-dark: #141518;
+            --brand-panel: #121316;
+            --brand-card: #1b1d22;
+            --brand-border: #272a30;
+            --brand-neon: #84f03a;
+            --brand-neon-dark: #6ccd26;
+            --hero-light: #f4f5f7;
         }
-    });
-}
-</script>
+
+        body {
+            background-color: var(--brand-black) !important;
+            color: #e5e7eb;
+        }
+
+        .staffly-panel {
+            background-color: var(--brand-panel) !important;
+            border: 1px solid var(--brand-border) !important;
+            border-radius: 24px;
+        }
+
+        .staffly-shell {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .staffly-sidebar {
+            width: 230px;
+            flex-shrink: 0;
+            background-color: var(--brand-panel);
+            border-right: 1px solid var(--brand-border);
+        }
+
+        .staffly-main-area {
+            flex: 1 1 auto;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 992px) {
+            .staffly-sidebar {
+                position: sticky;
+                top: 0;
+                height: 100vh;
+            }
+        }
+
+        .sidebar-menu-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            border-radius: 14px;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .sidebar-menu-link:hover {
+            background-color: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+        }
+
+        .sidebar-menu-link.active {
+            background-color: var(--brand-neon);
+            color: #0c0d0e;
+            font-weight: 700;
+        }
+
+        .mobile-topbar {
+            background-color: var(--brand-panel);
+            border-bottom: 1px solid var(--brand-border);
+        }
+
+        .detail-hero-header {
+            background: linear-gradient(
+                155deg,
+                #ffffff 0%,
+                #f4f5f7 48%,
+                #cff9a4 82%,
+                #84f03a 100%
+            );
+            color: #171717;
+        }
+    </style>
+</head>
+<body>
+    <div class="staffly-shell">
+
+        <!-- SIDEBAR -->
+        <aside class="staffly-sidebar offcanvas-lg offcanvas-start text-white" tabindex="-1" id="stafflySidebar" aria-labelledby="stafflySidebarLabel">
+            <div class="offcanvas-header border-bottom border-secondary border-opacity-25 px-4 py-3 d-lg-none">
+                <a href="../dashboard.php" class="d-flex align-items-center gap-2 text-white text-decoration-none fw-bold" id="stafflySidebarLabel">
+                    <img src="../assets/images/logo.png" alt="Staffly Logo" class="staffly-logo">
+                    <span>Staffly</span>
+                </a>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#stafflySidebar" aria-label="Close"></button>
+            </div>
+
+            <div class="offcanvas-body d-flex flex-column justify-content-between h-100 p-4">
+                <div>
+                    <a href="../dashboard.php" class="d-none d-lg-flex align-items-center gap-2 text-white text-decoration-none fw-bold fs-5 mb-1">
+                        <img src="../assets/images/logo.png" alt="Staffly Logo" class="staffly-logo">
+                        <span>Staffly</span>
+                    </a>
+                    <p class="d-none d-lg-block small text-secondary mb-4 ps-1">Workforce Directory</p>
+
+                    <div class="small text-uppercase fw-bold text-secondary mb-2 px-2" style="font-size: 0.7rem; letter-spacing: 0.06em;">
+                        Menu
+                    </div>
+
+                    <nav class="d-flex flex-column gap-2">
+                        <a href="../dashboard.php" class="sidebar-menu-link">
+                            <i class="bi bi-grid-1x2-fill"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="./index.php" class="sidebar-menu-link active">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Employees</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="pt-4 border-top border-secondary border-opacity-25">
+                    <div class="p-3 rounded-4 mb-3" style="background-color: var(--brand-card); border: 1px solid var(--brand-border);">
+                        <div class="small text-secondary">Signed in as</div>
+                        <div class="small fw-bold text-white text-truncate">
+                            <?= e($_SESSION['nama_lengkap'] ?? 'HR Administrator') ?>
+                        </div>
+                    </div>
+
+                    <a href="../logout.php" class="btn btn-neon w-100 py-2 text-decoration-none">
+                        <i class="bi bi-box-arrow-right me-1"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <div class="staffly-main-area">
+            <div class="mobile-topbar d-flex d-lg-none align-items-center justify-content-between px-3 py-3">
+                <a href="../dashboard.php" class="d-flex align-items-center gap-2 text-white text-decoration-none fw-bold">
+                    <img src="../assets/images/logo.png" alt="Staffly Logo" class="staffly-logo">
+                    <span>Staffly</span>
+                </a>
+                <button class="btn btn-sm btn-outline-light rounded-pill px-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#stafflySidebar" aria-controls="stafflySidebar">
+                    <i class="bi bi-list me-1"></i> Menu
+                </button>
+            </div>
+
+            <main class="container-fluid px-3 px-lg-4 py-5 flex-grow-1" style="max-width: 820px;">
+                <a href="./index.php" class="text-secondary text-decoration-none small d-inline-flex align-items-center gap-2 mb-4">
+                    <i class="bi bi-arrow-left"></i>Back to List
+                </a>
+
+                <div class="staffly-panel overflow-hidden">
+                    <div class="detail-hero-header p-4 p-sm-5 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <?php if (!empty($employee['foto'])): ?>
+                                <img src="../assets/images/employees/<?= e($employee['foto']) ?>" alt="<?= e($employee['nama']) ?>"
+                                     style="width: 64px; height: 64px; border-radius: 16px; object-fit: cover;">
+                            <?php else: ?>
+                                <div class="d-flex align-items-center justify-content-center fw-bold"
+                                     style="width: 64px; height: 64px; border-radius: 16px; background: #18191c; color: #84f03a; font-size: 1.25rem;">
+                                    <?= e(getInitials($employee['nama'])) ?>
+                                </div>
+                            <?php endif; ?>
+                            <div>
+                                <h1 class="h3 fw-bold mb-0"><?= e($employee['nama']) ?></h1>
+                                <div class="small text-dark opacity-75"><?= e($employee['jabatan']) ?> · <span class="font-mono-tabular"><?= e($employee['nip']) ?></span></div>
+                            </div>
+                        </div>
+                        <a href="./edit.php?id=<?= (int) $employee['id'] ?>" class="btn btn-dark rounded-pill px-4 py-2 small fw-bold flex-shrink-0" style="color: #84f03a;">
+                            Edit Data
+                        </a>
+                    </div>
+
+                    <div class="p-4 p-sm-5 row g-4">
+                        <div class="col-sm-6">
+                            <div class="small text-secondary mb-1">Internal Record ID</div>
+                            <div class="fw-semibold text-white font-mono-tabular">#<?= (int) $employee['id'] ?></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="small text-secondary mb-1">Employee ID (NIP)</div>
+                            <div class="fw-semibold text-white font-mono-tabular"><?= e($employee['nip']) ?></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="small text-secondary mb-1">Role / Position</div>
+                            <div class="fw-semibold text-white"><?= e($employee['jabatan']) ?></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="small text-secondary mb-1">Work Email</div>
+                            <div class="fw-semibold text-white"><?= e($employee['email']) ?></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="small text-secondary mb-1">Phone Number</div>
+                            <div class="fw-semibold text-white font-mono-tabular"><?= e($employee['no_telepon'] ?: 'Not provided') ?></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="small text-secondary mb-1">Created At</div>
+                            <div class="fw-semibold text-white font-mono-tabular"><?= e($employee['created_at']) ?></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

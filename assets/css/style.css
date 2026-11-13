@@ -1,507 +1,292 @@
-/* ==========================================================
-   assets/css/style.css
-   Tema Khusus: "Creatix Digital Studio & HR Engine"
-   Deep Obsidian (#0c0d0e) + Electric Neon Green (#84f03a) + Curved Off-White Hero (#f4f5f7)
-   Sesuai Spesifikasi Desain Creatix & Standar BNSP SKK-32-10/2024
-   ========================================================== */
+@charset "UTF-8";
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
 
-/* ---------- Design Tokens (Creatix Theme) ---------- */
 :root {
-    --creatix-black:      #0c0d0e; /* Deep Matte Obsidian */
-    --creatix-dark:       #141518; /* Surface Dark */
-    --creatix-card:       #1b1d22; /* Card Container */
-    --creatix-border:     #272a30; /* Subdued Stroke */
-    --creatix-border-light:#32363e;
-    
-    --creatix-neon:       #84f03a; /* Electric Neon Accent */
-    --creatix-neon-dark:  #6ccd26; /* Hover Accent */
-    --creatix-neon-soft:  #c2f88d;
-    --creatix-neon-glow:  rgba(132, 240, 58, 0.25);
-
-    --creatix-hero-bg:    #f4f5f7; /* Curved Off-White Hero */
-    --creatix-hero-text:  #111827; /* Dark Neutral 900 */
-    --creatix-hero-muted: #4b5563; /* Neutral 600 */
-
-    --creatix-text-main:  #f3f4f6; /* Gray 100 */
-    --creatix-text-muted: #9ca3af; /* Gray 400 */
-
-    --creatix-danger:     #f43f5e;
-    --creatix-warning:    #f59e0b;
-    --creatix-info:       #38bdf8;
-
-    --radius-pill:        9999px;
-    --radius-curve:       0 0 54px 54px;
-    --radius-card:        20px;
-    --radius-sm:          10px;
-
-    --transition:         all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    --brand-black: #0c0d0e;
+    --brand-dark: #141518;
+    --brand-panel: #121316;
+    --brand-card: #1b1d22;
+    --brand-border: #272a30;
+    --brand-neon: #84f03a;
+    --brand-neon-dark: #6ccd26;
+    --hero-light: #f4f5f7;
 }
 
-/* ---------- Base Setup ---------- */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
 body {
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
-    background-color: var(--creatix-black);
-    color: var(--creatix-text-main);
-    line-height: 1.6;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-}
-
-/* ---------- Top Strip ---------- */
-.creatix-topstrip {
-    background-color: var(--creatix-dark);
-    border-bottom: 1px solid var(--creatix-border);
-    color: var(--creatix-text-muted);
-    font-size: 0.78rem;
-    font-weight: 600;
-    padding: 0.45rem 0;
-    letter-spacing: 0.02em;
-}
-
-.creatix-topstrip .neon-dot {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background-color: var(--creatix-neon);
-    box-shadow: 0 0 8px var(--creatix-neon);
-}
-
-/* ---------- Navbar Creatix ---------- */
-.creatix-navbar {
-    background-color: rgba(12, 13, 14, 0.95);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--creatix-border);
-    padding: 0.9rem 0;
-}
-
-.creatix-brand {
-    font-weight: 800;
-    font-size: 1.35rem;
-    color: #ffffff !important;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    letter-spacing: -0.02em;
-}
-
-.creatix-brand-badge {
-    background-color: var(--creatix-neon);
-    color: #000000;
-    font-size: 0.65rem;
-    font-weight: 800;
-    padding: 2px 8px;
-    border-radius: var(--radius-pill);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.creatix-nav-link {
-    color: var(--creatix-text-muted) !important;
-    font-size: 0.9rem;
-    font-weight: 600;
-    padding: 0.5rem 1rem !important;
-    border-radius: var(--radius-pill);
-    transition: var(--transition);
-}
-
-.creatix-nav-link:hover {
-    color: #ffffff !important;
-    background-color: rgba(255, 255, 255, 0.06);
-}
-
-.creatix-nav-link.active {
-    color: #000000 !important;
-    background-color: var(--creatix-neon) !important;
-    font-weight: 700;
-}
-
-/* ---------- Buttons Khas Creatix ---------- */
-.btn-creatix-neon {
-    background-color: var(--creatix-neon);
-    color: #000000 !important;
-    font-weight: 800;
-    font-size: 0.88rem;
-    padding: 0.6rem 1.4rem;
-    border-radius: var(--radius-pill);
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: var(--transition);
-    text-decoration: none;
-}
-
-.btn-creatix-neon:hover {
-    background-color: var(--creatix-neon-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px var(--creatix-neon-glow);
-}
-
-.btn-creatix-dark {
-    background-color: #18191c;
-    color: #ffffff !important;
-    font-weight: 600;
-    font-size: 0.88rem;
-    padding: 0.6rem 1.4rem;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--creatix-border);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: var(--transition);
-    text-decoration: none;
-}
-
-.btn-creatix-dark:hover {
-    background-color: var(--creatix-card);
-    border-color: #4b5563;
-    transform: translateY(-2px);
-    color: var(--creatix-neon) !important;
-}
-
-/* Floating Dual Action Dock (Pill Group dari Creatix Hero) */
-.creatix-action-dock {
-    display: inline-flex;
-    align-items: center;
-    background-color: #18191c;
-    border: 1px solid var(--creatix-border);
-    padding: 5px;
-    border-radius: var(--radius-pill);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    gap: 6px;
-}
-
-/* ---------- Hero Section (Curved Off-White Island Khas Creatix) ---------- */
-.creatix-hero-curved {
-    background-color: var(--creatix-hero-bg);
-    color: var(--creatix-hero-text);
-    border-radius: var(--radius-curve);
-    padding: 4.5rem 1.5rem 4rem;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 3.5rem;
-}
-
-/* Bintang 8-sudut khas Creatix di pojok kiri */
-.creatix-star-decor {
-    position: absolute;
-    top: 36px;
-    left: 36px;
-    color: #71db29;
-    opacity: 0.9;
-    pointer-events: none;
-}
-
-.creatix-hero-heading {
-    font-weight: 900;
-    font-size: 2.8rem;
-    line-height: 1.1;
-    letter-spacing: -0.03em;
-    color: var(--creatix-hero-text);
-    margin-bottom: 1.25rem;
-}
-
-.creatix-hero-desc {
-    color: var(--creatix-hero-muted);
-    font-size: 1rem;
-    max-width: 480px;
-    line-height: 1.6;
-}
-
-/* Experience Rating Card di pojok kanan hero */
-.creatix-rating-card {
-    background-color: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    padding: 1.25rem 1.5rem;
-    border-radius: 18px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-}
-
-.creatix-rating-stars {
-    color: #71db29;
-    font-size: 1rem;
-    margin-bottom: 4px;
-}
-
-/* ---------- Infinite Marquee Ticker Banner (Khas Creatix) ---------- */
-.creatix-ticker-wrapper {
-    overflow: hidden;
-    background-color: var(--creatix-dark);
-    border-top: 1px solid var(--creatix-border);
-    border-bottom: 1px solid var(--creatix-border);
-    padding: 1rem 0;
-    margin-bottom: 3.5rem;
-    white-space: nowrap;
-}
-
-.creatix-ticker-track {
-    display: inline-flex;
-    animation: marquee 28s linear infinite;
-}
-
-.creatix-ticker-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 0.9rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #ffffff;
-    margin-right: 48px;
-}
-
-.creatix-ticker-item span.neon {
-    color: var(--creatix-neon);
-}
-
-@keyframes marquee {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-}
-
-/* ---------- Services & Feature Cards (Dark Theme Creatix) ---------- */
-.creatix-card {
-    background-color: var(--creatix-card);
-    border: 1px solid var(--creatix-border);
-    border-radius: var(--radius-card);
-    padding: 2rem;
-    transition: var(--transition);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.creatix-card:hover {
-    border-color: var(--creatix-neon);
-    transform: translateY(-4px);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
-}
-
-.creatix-card-number {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: var(--creatix-neon);
-    line-height: 1;
-    margin-bottom: 1rem;
-}
-
-.creatix-card-title {
-    font-weight: 800;
-    font-size: 1.25rem;
-    letter-spacing: -0.02em;
-    color: #ffffff;
-    margin-bottom: 0.75rem;
-}
-
-.creatix-card-desc {
-    color: var(--creatix-text-muted);
-    font-size: 0.9rem;
-    line-height: 1.55;
-    margin-bottom: 1.5rem;
-}
-
-/* Metric Stats Card */
-.creatix-stat-card {
-    background-color: var(--creatix-card);
-    border: 1px solid var(--creatix-border);
-    border-radius: var(--radius-card);
-    padding: 1.5rem;
-    text-align: center;
-    transition: var(--transition);
-}
-
-.creatix-stat-card:hover {
-    border-color: var(--creatix-neon);
-    transform: translateY(-3px);
-}
-
-.creatix-stat-num {
-    font-size: 2.4rem;
-    font-weight: 900;
-    color: #ffffff;
-    line-height: 1;
-    letter-spacing: -0.03em;
-}
-
-.creatix-stat-label {
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--creatix-neon);
-    margin-top: 6px;
-}
-
-/* ---------- Table Styling (Creatix Dark Edition) ---------- */
-.creatix-table-card {
-    background-color: var(--creatix-card);
-    border: 1px solid var(--creatix-border);
-    border-radius: var(--radius-card);
-    overflow: hidden;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-}
-
-.creatix-table {
-    margin-bottom: 0;
-    color: var(--creatix-text-main);
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-.creatix-table thead th {
-    background-color: var(--creatix-dark);
-    color: #9ca3af;
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 1.1rem 1.25rem;
-    border-bottom: 1px solid var(--creatix-border);
-    border-top: none;
-}
-
-.creatix-table tbody td {
-    padding: 1.1rem 1.25rem;
-    vertical-align: middle;
-    border-bottom: 1px solid var(--creatix-border);
-    font-size: 0.9rem;
-}
-
-.creatix-table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.03);
-}
-
-.badge-creatix-nip {
-    font-family: 'JetBrains Mono', Consolas, monospace;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--creatix-neon);
-    background-color: rgba(132, 240, 58, 0.1);
-    border: 1px solid rgba(132, 240, 58, 0.3);
-    padding: 4px 10px;
-    border-radius: var(--radius-pill);
-}
-
-.badge-creatix-role {
-    font-size: 0.78rem;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: var(--radius-pill);
-    background-color: var(--creatix-dark);
+    background-color: var(--brand-black);
     color: #e5e7eb;
-    border: 1px solid var(--creatix-border-light);
-}
-
-/* Action Icon Buttons */
-.btn-action-creatix {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--creatix-dark);
-    border: 1px solid var(--creatix-border);
-    color: #e5e7eb;
-    font-size: 0.9rem;
-    transition: var(--transition);
-    text-decoration: none;
-}
-
-.btn-action-creatix:hover {
-    background-color: var(--creatix-neon);
-    color: #000000;
-    border-color: var(--creatix-neon);
-    transform: scale(1.1);
-}
-
-.btn-action-creatix.del:hover {
-    background-color: var(--creatix-danger);
-    color: #ffffff;
-    border-color: var(--creatix-danger);
-}
-
-/* ---------- Login Page Creatix ---------- */
-.creatix-login-wrapper {
+    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
     min-height: 100vh;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--creatix-black);
-    padding: 1.5rem;
-    position: relative;
+    flex-direction: column;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-.creatix-login-card {
+.font-mono-tabular {
+    font-family: 'Space Grotesk', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Floating Pill Navbar */
+.staffly-nav-wrap {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    display: flex;
+    justify-content: center;
+    padding: 0 16px;
+}
+
+.staffly-nav {
+    background: rgba(24, 25, 28, 0.94);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(115, 115, 115, 0.35);
+    border-radius: 9999px;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+}
+
+.staffly-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background-color: var(--brand-neon);
+    box-shadow: 0 0 12px rgba(132, 240, 58, 0.65);
+    display: inline-block;
+}
+
+.staffly-logo {
+    height: 1.5em;
+    width: auto;
+    object-fit: contain;
+    display: inline-block;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.staffly-nav-link {
+    color: #d4d4d8;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+}
+
+.staffly-nav-link:hover,
+.staffly-nav-link.active {
+    color: var(--brand-neon);
+}
+
+/* Curved Light Hero Stage */
+.hero-container-curve {
+    background-color: var(--hero-light);
+    color: #171717;
+    border-radius: 0 0 60px 60px;
+    padding-top: 120px;
+    padding-bottom: 64px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Cards & Hover Motion */
+.staffly-card {
+    background-color: var(--brand-dark);
+    border: 1px solid var(--brand-border);
+    border-radius: 24px;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.staffly-panel {
+    background-color: var(--brand-panel);
+    border: 1px solid var(--brand-border);
+    border-radius: 24px;
+}
+
+.card-hover-lift {
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card-hover-lift:hover {
+    transform: translateY(-2px);
+    border-color: #3f444e;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .card-hover-lift,
+    .card-hover-lift:hover,
+    .staffly-card {
+        transition: none;
+        transform: none;
+    }
+}
+
+/* Buttons & Inputs */
+.btn-neon {
+    background-color: var(--brand-neon);
+    color: #000000;
+    font-weight: 700;
+    border-radius: 9999px;
+    border: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-neon:hover {
+    background-color: var(--brand-neon-dark);
+    color: #000000;
+    transform: translateY(-1px);
+}
+
+.staffly-input {
+    background-color: var(--brand-card);
+    border: 1px solid #32363e;
+    color: #ffffff;
+    border-radius: 16px;
+    padding: 12px 16px;
+    font-size: 0.875rem;
+}
+
+.staffly-input:focus {
+    background-color: var(--brand-card);
+    border-color: var(--brand-neon);
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.staffly-input::placeholder {
+    color: #71717a;
+}
+
+/* Table Theme */
+.staffly-table {
+    --bs-table-bg: transparent;
+    --bs-table-color: #e5e7eb;
+    --bs-table-border-color: #262930;
+    --bs-table-hover-bg: #191b21;
+    --bs-table-hover-color: #ffffff;
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.015);
+    --bs-table-striped-color: #e5e7eb;
+}
+
+.avatar-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 9999px;
+    object-fit: cover;
+    border: 1px solid #3f3f46;
+}
+
+.avatar-initials {
+    width: 36px;
+    height: 36px;
+    border-radius: 9999px;
+    background-color: var(--brand-card);
+    border: 1px solid #3f3f46;
+    color: var(--brand-neon);
+    font-size: 0.72rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Neon Green Footer */
+.staffly-footer {
+    background-color: var(--brand-neon);
+    color: #0c0d0e;
+    border-radius: 24px;
+}
+
+.staffly-footer a {
+    color: #171717;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.staffly-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Khusus Landing / Login Page: Side-by-Side & Pembatas Lurus */
+.login-split-wrapper {
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* Sisi Kiri: Gambar Latar */
+.login-hero-side {
+    flex: 1 1 52%;
+    background-image:
+        linear-gradient(rgba(12, 13, 14, 0.55), rgba(12, 13, 14, 0.65)),
+        url('../images/banner_dashboard.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #ffffff;
+    border-radius: 0;
+    padding: 64px 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-hero-inner {
+    width: 100%;
+    max-width: 520px;
+}
+
+/* Sisi Kanan: Gradient Putih -> Hijau + Card Sign In */
+.login-form-side {
+    flex: 1 1 48%;
+    background: linear-gradient(155deg,
+            #ffffff 0%,
+            var(--hero-light) 38%,
+            #cff9a4 72%,
+            var(--brand-neon) 100%);
+    padding: 64px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.login-form-side .staffly-card {
     width: 100%;
     max-width: 440px;
-    background-color: var(--creatix-card);
-    border: 1px solid var(--creatix-border);
-    border-radius: var(--radius-card);
-    padding: 2.75rem 2.25rem;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
-    position: relative;
-    z-index: 2;
 }
 
-/* ---------- Form Controls Creatix ---------- */
-.form-control, .form-select {
-    border-radius: 12px;
-    border: 1.5px solid var(--creatix-border);
-    padding: 0.7rem 1rem;
-    font-size: 0.92rem;
-    color: #ffffff;
-    background-color: var(--creatix-dark);
-    transition: var(--transition);
-}
+/* Responsif di layar HP / Tablet */
+@media (max-width: 991.98px) {
+    .login-split-wrapper {
+        flex-direction: column;
+    }
 
-.form-control:focus, .form-select:focus {
-    border-color: var(--creatix-neon);
-    box-shadow: 0 0 0 3px var(--creatix-neon-glow);
-    background-color: #1a1c21;
-    color: #ffffff;
-}
+    .login-hero-side {
+        padding: 56px 24px 44px;
+    }
 
-.form-control::placeholder {
-    color: #6b7280;
-}
-
-/* Footer Creatix */
-.creatix-footer {
-    background-color: var(--creatix-dark);
-    border-top: 1px solid var(--creatix-border);
-    color: var(--creatix-text-muted);
-    padding: 2.5rem 0 1.5rem;
-    margin-top: auto;
-    font-size: 0.88rem;
-}
-
-.creatix-footer a {
-    color: var(--creatix-neon);
-    text-decoration: none;
-}
-
-/* Loading Overlay */
-#loadingOverlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(12, 13, 14, 0.8);
-    backdrop-filter: blur(4px);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-}
-
-#loadingOverlay.active {
-    display: flex;
+    .login-form-side {
+        padding: 40px 20px 56px;
+        border-left: none;
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+    }
 }
