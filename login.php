@@ -136,14 +136,6 @@ unset($_SESSION['login_error']);
                     </div>
                     <button type="submit" class="btn btn-neon w-100 py-2.5">Sign In</button>
                 </form>
-
-                <div class="mt-4 pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center small text-secondary">
-                    <span>Demo: <code class="text-light">admin</code> / <code class="text-light">admin123</code></span>
-                    <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold" style="color: #84f03a;"
-                        onclick="document.getElementById('username').value='admin'; document.getElementById('password').value='admin123';">
-                        Fill Demo
-                    </button>
-                </div>
             </div>
         </section>
     </main>

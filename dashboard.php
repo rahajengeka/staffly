@@ -178,6 +178,13 @@ $chartValues = json_encode(array_column($chartData, 'total'));
             background-color: var(--brand-panel);
             border-bottom: 1px solid var(--brand-border);
         }
+
+        @media (min-width: 992px) {
+            .chart-divider {
+                border-left: 1px solid var(--brand-border);
+                padding-left: 1.75rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -406,8 +413,38 @@ $chartValues = json_encode(array_column($chartData, 'total'));
                                     </ul>
                                 </div>
                             </div>
-                            <div style="height: 220px; position: relative;">
-                                <canvas id="roleChart"></canvas>
+                            <div class="row g-4 align-items-center">
+                                <!-- Kolom Kiri: Bar Chart -->
+                                <div class="col-lg-7">
+                                    <div style="height: 220px; position: relative;">
+                                        <canvas id="roleChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Kolom Kanan: Top Roles & Headcount Breakdown -->
+                                <div class="col-lg-5 chart-divider">
+                                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+                                        <span class="small fw-semibold text-secondary text-uppercase" style="letter-spacing: 0.5px; font-size: 0.75rem;">Top Headcount Roles</span>
+                                        <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(132, 240, 58, 0.12); color: #84f03a; border: 1px solid rgba(132, 240, 58, 0.3); font-size: 0.75rem;">
+                                            <?= count($chartData) ?> Active Roles
+                                        </span>
+                                    </div>
+                                    <div class="d-flex flex-column gap-3">
+                                        <?php foreach (array_slice($chartData, 0, 4) as $item): 
+                                            $pct = $totalEmployees > 0 ? round(($item['total'] / $totalEmployees) * 100) : 0;
+                                        ?>
+                                            <div>
+                                                <div class="d-flex justify-content-between align-items-center mb-1 small">
+                                                    <span class="text-white fw-semibold" style="font-size: 0.85rem;"><?= e($item['jabatan']) ?></span>
+                                                    <span class="text-secondary font-mono-tabular" style="font-size: 0.8rem;"><?= (int) $item['total'] ?> emp <span class="opacity-75">(<?= $pct ?>%)</span></span>
+                                                </div>
+                                                <div class="progress" style="height: 6px; background-color: #272a30; border-radius: 999px;">
+                                                    <div class="progress-bar" role="progressbar" style="width: <?= $pct ?>%; background-color: #84f03a; border-radius: 999px;" aria-valuenow="<?= $pct ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -467,6 +504,9 @@ $chartValues = json_encode(array_column($chartData, 'total'));
                         borderWidth: 2,
                         borderRadius: 8,
                         borderSkipped: false,
+                        maxBarThickness: 28,
+                        barPercentage: 0.85,
+                        categoryPercentage: 0.8,
                     }]
                 },
                 options: {
@@ -485,10 +525,10 @@ $chartValues = json_encode(array_column($chartData, 'total'));
                     scales: {
                         x: {
                             ticks: { color: '#9ca3af', font: { size: 11 } },
-                            grid: { color: 'rgba(255,255,255,0.05)' }
+                            grid: { display: false }
                         },
                         y: {
-                            ticks: { color: '#9ca3af', stepSize: 1, font: { size: 11 } },
+                            ticks: { color: '#9ca3af', stepSize: 1, precision: 0, font: { size: 11 } },
                             grid: { color: 'rgba(255,255,255,0.05)' },
                             beginAtZero: true,
                         }

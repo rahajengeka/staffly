@@ -77,6 +77,8 @@ staffly/
 ├── index.php                    # Entry point pengarah (redirect) ke login.php
 ├── login.php                    # Halaman antarmuka login
 ├── logout.php                   # Pembersihan sesi dan logout pengguna
+├── antislop.md                  # Anti-Slop filter rulebook (miqdadbadjuber/anti-slop)
+├── DESIGN.md                    # Sistem desain otentik & standar visual interface
 └── README.md                    # Dokumentasi teknis proyek
 ```
 
