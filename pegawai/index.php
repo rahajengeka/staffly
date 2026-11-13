@@ -128,6 +128,12 @@ unset($_SESSION['flash_success']);
             border-bottom: 1px solid var(--brand-border);
         }
 
+        /* Dropdown Export hover */
+        .dropdown-menu .dropdown-item:hover {
+            background-color: rgba(132, 240, 58, 0.1) !important;
+            color: #ffffff !important;
+        }
+
         /* Table Compact & Muat di Layar */
         .staffly-table {
             --bs-table-bg: transparent;
@@ -266,9 +272,35 @@ unset($_SESSION['flash_success']);
                                 Browse all registered employees, inspect profiles, edit data, or delete rows dynamically.
                             </p>
                         </div>
-                        <a href="./tambah.php" class="btn btn-dark rounded-pill px-4 py-2 text-decoration-none small fw-bold flex-shrink-0" style="color: #84f03a;">
-                            <i class="bi bi-plus-lg me-1"></i>Add Employee
-                        </a>
+                        <div class="d-flex gap-2 flex-shrink-0">
+                            <!-- Dropdown Export -->
+                            <div class="dropdown">
+                                <button class="btn btn-light rounded-pill px-4 py-2 small fw-bold border d-flex align-items-center gap-2 dropdown-toggle"
+                                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-box-arrow-up"></i> Export
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow mt-2"
+                                    style="background-color: #1b1d22; border: 1px solid #32363e; border-radius: 14px; min-width: 170px; padding: 6px;">
+                                    <li>
+                                        <a href="../proses/export_csv.php"
+                                           class="dropdown-item rounded-3 d-flex align-items-center gap-2 small fw-semibold"
+                                           style="color: #e5e7eb; padding: 10px 14px;">
+                                            <i class="bi bi-filetype-csv" style="color: #84f03a;"></i> Export as CSV
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <button id="btnExportPdf"
+                                                class="dropdown-item rounded-3 d-flex align-items-center gap-2 small fw-semibold w-100 border-0"
+                                                style="color: #e5e7eb; padding: 10px 14px; background: transparent;">
+                                            <i class="bi bi-filetype-pdf" style="color: #84f03a;"></i> Export as PDF
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <a href="./tambah.php" class="btn btn-dark rounded-pill px-4 py-2 text-decoration-none small fw-bold" style="color: #84f03a;">
+                                <i class="bi bi-plus-lg me-1"></i>Add Employee
+                            </a>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -276,13 +308,13 @@ unset($_SESSION['flash_success']);
             <!-- Tabel Data Pegawai -->
             <main class="container-fluid px-3 px-lg-4 py-4 flex-grow-1" style="max-width: 1140px;">
                 <?php if ($flashSuccess): ?>
-                    <div class="alert alert-success alert-dismissible fade show small" role="alert">
+                    <div id="ajaxAlertBox" class="alert alert-success alert-dismissible fade show small" role="alert">
                         <?= e($flashSuccess) ?>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
+                <?php else: ?>
+                    <div id="ajaxAlertBox" class="alert d-none small" role="alert"></div>
                 <?php endif; ?>
-
-                <div id="ajaxAlertBox" class="alert d-none small" role="alert"></div>
 
                 <div class="staffly-panel p-3 p-lg-4">
                     <div class="mb-3" style="max-width: 340px;">
@@ -368,6 +400,116 @@ unset($_SESSION['flash_success']);
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jsPDF + AutoTable untuk Export PDF -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
     <script src="../assets/js/script.js"></script>
+    <script>
+        // Auto-show toast jika ada flash sukses dari PHP
+        <?php if ($flashSuccess): ?>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toastEl = document.getElementById('stafflyToast');
+            if (toastEl) {
+                new bootstrap.Toast(toastEl, { delay: 4000 }).show();
+            }
+        });
+        <?php endif; ?>
+
+        // ── Fungsi Export PDF ─────────────────────────────────────────────
+        function doExportPdf() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+            // Header dokumen — strip neon green
+            doc.setFillColor(132, 240, 58);
+            doc.rect(0, 0, 297, 18, 'F');
+            doc.setTextColor(12, 13, 14);
+            doc.setFontSize(13);
+            doc.setFont('helvetica', 'bold');
+            doc.text('STAFFLY — Employee Records', 14, 12);
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Generated: ' + dateStr, 283, 12, { align: 'right' });
+
+            // Ambil data dari tabel (ikut live search filter)
+            const rows = [];
+            let counter = 1;
+            document.querySelectorAll('#employeeTableBody tr[data-row]').forEach((tr) => {
+                if (tr.style.display === 'none') return;
+                const cells = tr.querySelectorAll('td');
+                const nip     = cells[1] ? cells[1].textContent.trim() : '';
+                const nama    = cells[2] ? cells[2].textContent.trim() : '';
+                const email   = cells[3] ? cells[3].textContent.trim() : '';
+                const jabatan = cells[4] ? cells[4].textContent.trim() : '';
+                rows.push([counter++, nip, nama, email, jabatan]);
+            });
+
+            doc.autoTable({
+                startY: 23,
+                head: [['No', 'Employee ID (NIP)', 'Full Name', 'Work Email', 'Role / Position']],
+                body: rows,
+                styles: {
+                    fontSize: 9,
+                    cellPadding: 4,
+                    textColor: [30, 30, 30],
+                    lineColor: [220, 220, 220],
+                    lineWidth: 0.1,
+                },
+                headStyles: {
+                    fillColor: [20, 21, 24],
+                    textColor: [132, 240, 58],
+                    fontStyle: 'bold',
+                    fontSize: 9,
+                },
+                alternateRowStyles: { fillColor: [245, 246, 248] },
+                columnStyles: {
+                    0: { halign: 'center', cellWidth: 12 },
+                    1: { cellWidth: 52 },
+                    2: { cellWidth: 55, fontStyle: 'bold' },
+                    3: { cellWidth: 70 },
+                    4: { cellWidth: 55 },
+                },
+                margin: { left: 14, right: 14 },
+                didDrawPage: function () {
+                    const pageCount = doc.internal.getNumberOfPages();
+                    doc.setFontSize(7);
+                    doc.setTextColor(150);
+                    doc.text(
+                        'Staffly Employee Management System  |  Page ' +
+                        doc.internal.getCurrentPageInfo().pageNumber + ' of ' + pageCount,
+                        14, doc.internal.pageSize.height - 8
+                    );
+                }
+            });
+
+            doc.save('staffly_employees_' + now.toISOString().slice(0, 10) + '.pdf');
+        }
+
+        // Tombol Export PDF di halaman ini
+        document.getElementById('btnExportPdf').addEventListener('click', doExportPdf);
+
+        // Auto-trigger jika diarahkan dari dashboard (via localStorage flag)
+        window.addEventListener('load', function () {
+            if (localStorage.getItem('triggerPdfExport') === '1') {
+                localStorage.removeItem('triggerPdfExport');
+                setTimeout(doExportPdf, 800); // tunggu tabel render
+            }
+        });
+
+        // Hover dropdown item
+        document.querySelectorAll('.dropdown-menu .dropdown-item').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                el.style.backgroundColor = 'rgba(132, 240, 58, 0.1)';
+                el.style.color = '#ffffff';
+            });
+            el.addEventListener('mouseleave', () => {
+                el.style.backgroundColor = '';
+                el.style.color = '#e5e7eb';
+            });
+        });
+    </script>
 </body>
 </html>

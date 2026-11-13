@@ -117,6 +117,32 @@ if (!$employee) {
             );
             color: #171717;
         }
+
+        @media print {
+            .staffly-sidebar,
+            .mobile-topbar,
+            .no-print {
+                display: none !important;
+            }
+            .staffly-shell {
+                display: block !important;
+            }
+            .staffly-main-area {
+                width: 100% !important;
+            }
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+            }
+            .staffly-panel {
+                border: 1px solid #ccc !important;
+                background: #ffffff !important;
+            }
+            .detail-hero-header {
+                background: #f4f5f7 !important;
+                print-color-adjust: exact;
+            }
+        }
     </style>
 </head>
 <body>
@@ -126,6 +152,7 @@ if (!$employee) {
         <aside class="staffly-sidebar offcanvas-lg offcanvas-start text-white" tabindex="-1" id="stafflySidebar" aria-labelledby="stafflySidebarLabel">
             <div class="offcanvas-header border-bottom border-secondary border-opacity-25 px-4 py-3 d-lg-none">
                 <a href="../dashboard.php" class="d-flex align-items-center gap-2 text-white text-decoration-none fw-bold" id="stafflySidebarLabel">
+                    <span class="staffly-dot"></span>
                     <img src="../assets/images/logo.png" alt="Staffly Logo" class="staffly-logo">
                     <span>Staffly</span>
                 </a>
@@ -135,6 +162,7 @@ if (!$employee) {
             <div class="offcanvas-body d-flex flex-column justify-content-between h-100 p-4">
                 <div>
                     <a href="../dashboard.php" class="d-none d-lg-flex align-items-center gap-2 text-white text-decoration-none fw-bold fs-5 mb-1">
+                        <span class="staffly-dot"></span>
                         <img src="../assets/images/logo.png" alt="Staffly Logo" class="staffly-logo">
                         <span>Staffly</span>
                     </a>
@@ -175,6 +203,7 @@ if (!$employee) {
         <div class="staffly-main-area">
             <div class="mobile-topbar d-flex d-lg-none align-items-center justify-content-between px-3 py-3">
                 <a href="../dashboard.php" class="d-flex align-items-center gap-2 text-white text-decoration-none fw-bold">
+                    <span class="staffly-dot"></span>
                     <img src="../assets/images/logo.png" alt="Staffly Logo" class="staffly-logo">
                     <span>Staffly</span>
                 </a>
@@ -205,9 +234,15 @@ if (!$employee) {
                                 <div class="small text-dark opacity-75"><?= e($employee['jabatan']) ?> · <span class="font-mono-tabular"><?= e($employee['nip']) ?></span></div>
                             </div>
                         </div>
-                        <a href="./edit.php?id=<?= (int) $employee['id'] ?>" class="btn btn-dark rounded-pill px-4 py-2 small fw-bold flex-shrink-0" style="color: #84f03a;">
-                            Edit Data
-                        </a>
+                        <div class="d-flex gap-2 flex-shrink-0 no-print">
+                            <button onclick="window.print()" class="btn btn-sm rounded-pill px-3 py-2 fw-bold"
+                                style="background-color: var(--brand-card); border: 1px solid #32363e; color: #e5e7eb; font-size: 0.8rem;">
+                                <i class="bi bi-printer me-1"></i>Print
+                            </button>
+                            <a href="./edit.php?id=<?= (int) $employee['id'] ?>" class="btn btn-dark rounded-pill px-4 py-2 small fw-bold" style="color: #84f03a;">
+                                Edit Data
+                            </a>
+                        </div>
                     </div>
 
                     <div class="p-4 p-sm-5 row g-4">
@@ -242,5 +277,6 @@ if (!$employee) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/script.js"></script>
 </body>
 </html>

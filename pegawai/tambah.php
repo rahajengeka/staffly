@@ -4,6 +4,11 @@ requireAuth('../login.php');
 
 $error = $_SESSION['form_error'] ?? '';
 unset($_SESSION['form_error']);
+
+// Generate NIP otomatis: YYYYMMDD + 4 digit sequence (contoh: 202611140005)
+$maxId = (int) $pdo->query("SELECT MAX(id) FROM employees")->fetchColumn();
+$autoNip = date('Ymd') . str_pad((string) ($maxId + 1), 4, '0', STR_PAD_LEFT);
+$daftarJabatan = getDaftarJabatan($pdo);
 ?>
 <!doctype html>
 <html lang="en">
@@ -187,8 +192,14 @@ unset($_SESSION['form_error']);
                     <form id="employeeForm" action="../proses/proses_tambah.php" method="POST" enctype="multipart/form-data" novalidate>
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label for="nip" class="form-label small fw-semibold text-light">Employee ID (NIP) *</label>
-                                <input type="text" id="nip" name="nip" class="form-control staffly-input font-mono-tabular" placeholder="e.g. 199801152024011001" required>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="nip" class="form-label small fw-semibold text-light mb-0">Employee ID (NIP) *</label>
+                                    <button type="button" id="btnGenNip" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold" style="color: #84f03a; font-size: 0.76rem;">
+                                        <i class="bi bi-arrow-clockwise me-1"></i>Regenerate
+                                    </button>
+                                </div>
+                                <input type="text" id="nip" name="nip" class="form-control staffly-input font-mono-tabular" value="<?= e($autoNip) ?>" placeholder="e.g. 199801152024011001" required>
+                                <div class="form-text text-secondary" style="font-size: 0.72rem;">Otomatis dibuat oleh sistem, tetap bisa diedit manual.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="nama" class="form-label small fw-semibold text-light">Full Name *</label>
@@ -200,7 +211,12 @@ unset($_SESSION['form_error']);
                             </div>
                             <div class="col-md-6">
                                 <label for="jabatan" class="form-label small fw-semibold text-light">Role / Position *</label>
-                                <input type="text" id="jabatan" name="jabatan" class="form-control staffly-input" placeholder="e.g. UI/UX Designer" required>
+                                <select id="jabatan" name="jabatan" class="form-select staffly-input" required>
+                                    <option value="" disabled selected>— Select Role / Position —</option>
+                                    <?php foreach ($daftarJabatan as $role): ?>
+                                        <option value="<?= e($role) ?>"><?= e($role) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                             <div class="col-md-6">
                                 <label for="no_telepon" class="form-label small fw-semibold text-light">Phone Number</label>
@@ -225,5 +241,18 @@ unset($_SESSION['form_error']);
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/script.js"></script>
+    <script>
+        const btnGen = document.getElementById('btnGenNip');
+        if (btnGen) {
+            btnGen.addEventListener('click', function () {
+                const now = new Date();
+                const y = now.getFullYear();
+                const m = String(now.getMonth() + 1).padStart(2, '0');
+                const d = String(now.getDate()).padStart(2, '0');
+                const rand = String(Math.floor(1000 + Math.random() * 9000));
+                document.getElementById('nip').value = `${y}${m}${d}${rand}`;
+            });
+        }
+    </script>
 </body>
 </html>

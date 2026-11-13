@@ -19,6 +19,8 @@ if (!$employee) {
 
 $error = $_SESSION['form_error'] ?? '';
 unset($_SESSION['form_error']);
+
+$daftarJabatan = getDaftarJabatan($pdo);
 ?>
 <!doctype html>
 <html lang="en">
@@ -217,7 +219,13 @@ unset($_SESSION['form_error']);
                             </div>
                             <div class="col-md-6">
                                 <label for="jabatan" class="form-label small fw-semibold text-light">Role / Position *</label>
-                                <input type="text" id="jabatan" name="jabatan" value="<?= e($employee['jabatan']) ?>" class="form-control staffly-input" required>
+                                <select id="jabatan" name="jabatan" class="form-select staffly-input" required>
+                                    <?php foreach ($daftarJabatan as $role): ?>
+                                        <option value="<?= e($role) ?>" <?= ($employee['jabatan'] === $role) ? 'selected' : '' ?>>
+                                            <?= e($role) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                             <div class="col-md-6">
                                 <label for="no_telepon" class="form-label small fw-semibold text-light">Phone Number</label>

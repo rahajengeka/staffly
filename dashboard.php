@@ -6,6 +6,11 @@ $totalEmployees = (int) $pdo->query("SELECT COUNT(*) FROM employees")->fetchColu
 $totalRoles = (int) $pdo->query("SELECT COUNT(DISTINCT jabatan) FROM employees")->fetchColumn();
 $verifiedPhones = (int) $pdo->query("SELECT COUNT(*) FROM employees WHERE no_telepon IS NOT NULL AND TRIM(no_telepon) != ''")->fetchColumn();
 $recentEmployees = $pdo->query("SELECT * FROM employees ORDER BY id DESC LIMIT 4")->fetchAll();
+
+// Data untuk chart: jumlah pegawai per jabatan
+$chartData = $pdo->query("SELECT jabatan, COUNT(*) as total FROM employees GROUP BY jabatan ORDER BY total DESC LIMIT 7")->fetchAll();
+$chartLabels = json_encode(array_column($chartData, 'jabatan'));
+$chartValues = json_encode(array_column($chartData, 'total'));
 ?>
 <!doctype html>
 <html lang="en">
@@ -363,6 +368,51 @@ $recentEmployees = $pdo->query("SELECT * FROM employees ORDER BY id DESC LIMIT 4
                         </div>
                     </div>
                 </div>
+
+                <!-- Chart: Employees by Role -->
+                <?php if (!empty($chartData)): ?>
+                <div class="row g-4 mt-0">
+                    <div class="col-12">
+                        <div class="staffly-panel p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h2 class="h5 fw-bold text-white mb-1">Employees by Role</h2>
+                                    <p class="small text-secondary mb-0">Distribution of headcount across job positions</p>
+                                </div>
+                                <!-- Dropdown Export di Dashboard -->
+                                <div class="dropdown">
+                                    <button class="btn btn-sm rounded-pill fw-bold px-4 py-2 d-flex align-items-center gap-2 dropdown-toggle"
+                                            type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                            style="background-color: var(--brand-card); border: 1px solid #32363e; color: #84f03a; font-size: 0.8rem;">
+                                        <i class="bi bi-box-arrow-up"></i> Export
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow mt-2"
+                                        style="background-color: #1b1d22; border: 1px solid #32363e; border-radius: 14px; min-width: 170px; padding: 6px;">
+                                        <li>
+                                            <a href="./proses/export_csv.php"
+                                               class="dropdown-item rounded-3 d-flex align-items-center gap-2 small fw-semibold"
+                                               style="color: #e5e7eb; padding: 10px 14px;">
+                                                <i class="bi bi-filetype-csv" style="color: #84f03a;"></i> Export as CSV
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="./pegawai/index.php#export-pdf"
+                                               onclick="localStorage.setItem('triggerPdfExport','1'); return true;"
+                                               class="dropdown-item rounded-3 d-flex align-items-center gap-2 small fw-semibold"
+                                               style="color: #e5e7eb; padding: 10px 14px;">
+                                                <i class="bi bi-filetype-pdf" style="color: #84f03a;"></i> Export as PDF
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div style="height: 220px; position: relative;">
+                                <canvas id="roleChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
             </main>
 
             <footer class="container-fluid px-3 px-lg-5 pb-4 mt-auto" style="max-width: 1140px;">
@@ -387,6 +437,65 @@ $recentEmployees = $pdo->query("SELECT * FROM employees ORDER BY id DESC LIMIT 4
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
     <script src="./assets/js/script.js"></script>
+    <script>
+        // Hover styling dropdown di dashboard
+        document.querySelectorAll('.dropdown-menu .dropdown-item').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                el.style.backgroundColor = 'rgba(132, 240, 58, 0.1)';
+                el.style.color = '#ffffff';
+            });
+            el.addEventListener('mouseleave', () => {
+                el.style.backgroundColor = '';
+                el.style.color = '#e5e7eb';
+            });
+        });
+
+        // Chart: Pegawai per Jabatan
+        const ctx = document.getElementById('roleChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: <?= $chartLabels ?>,
+                    datasets: [{
+                        label: 'Employees',
+                        data: <?= $chartValues ?>,
+                        backgroundColor: 'rgba(132, 240, 58, 0.25)',
+                        borderColor: '#84f03a',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1b1d22',
+                            borderColor: '#272a30',
+                            borderWidth: 1,
+                            titleColor: '#84f03a',
+                            bodyColor: '#e5e7eb',
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#9ca3af', font: { size: 11 } },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        y: {
+                            ticks: { color: '#9ca3af', stepSize: 1, font: { size: 11 } },
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            beginAtZero: true,
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>

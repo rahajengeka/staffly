@@ -58,3 +58,30 @@ function requireAuth(string $loginPath = 'login.php'): void
         exit;
     }
 }
+
+function getDaftarJabatan(PDO $pdo): array
+{
+    $defaultRoles = [
+        'Web Developer',
+        'Frontend Developer',
+        'Backend Engineer',
+        'Full Stack Engineer',
+        'UI/UX Designer',
+        'Mobile App Developer',
+        'DevOps Engineer',
+        'QA Engineer',
+        'Product Manager',
+        'HR Specialist',
+        'Data Analyst',
+        'Finance & Accounting',
+    ];
+
+    try {
+        $dbRoles = $pdo->query("SELECT DISTINCT jabatan FROM employees WHERE jabatan IS NOT NULL AND TRIM(jabatan) != ''")->fetchAll(PDO::FETCH_COLUMN);
+        $merged = array_unique(array_merge($defaultRoles, $dbRoles));
+        sort($merged, SORT_STRING | SORT_FLAG_CASE);
+        return array_values($merged);
+    } catch (Exception $e) {
+        return $defaultRoles;
+    }
+}

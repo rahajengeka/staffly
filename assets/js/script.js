@@ -1,4 +1,60 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ── Toast helper ───────────────────────────────────────────────
+    function showToast(message, type = 'success') {
+        // Buat container toast jika belum ada
+        let container = document.getElementById('stafflyToastContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'stafflyToastContainer';
+            container.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;';
+            document.body.appendChild(container);
+        }
+
+        const bgColor   = type === 'success' ? '#84f03a' : '#dc3545';
+        const textColor = type === 'success' ? '#0c0d0e' : '#ffffff';
+
+        const toastEl = document.createElement('div');
+        toastEl.style.cssText = `
+            background:${bgColor};color:${textColor};
+            padding:12px 18px;border-radius:14px;font-size:0.85rem;font-weight:700;
+            box-shadow:0 8px 24px rgba(0,0,0,0.35);
+            display:flex;align-items:center;gap:10px;min-width:260px;max-width:360px;
+            animation:stafflySlideIn .25s ease;
+        `;
+        const icon = type === 'success' ? '✓' : '✕';
+        toastEl.innerHTML = `<span style="font-size:1rem;">${icon}</span><span>${message}</span>`;
+        container.appendChild(toastEl);
+
+        // Inject animasi CSS sekali
+        if (!document.getElementById('stafflyToastStyle')) {
+            const style = document.createElement('style');
+            style.id = 'stafflyToastStyle';
+            style.textContent = `
+                @keyframes stafflySlideIn {
+                    from { opacity:0; transform:translateX(30px); }
+                    to   { opacity:1; transform:translateX(0); }
+                }
+                @keyframes stafflySlideOut {
+                    from { opacity:1; transform:translateX(0); }
+                    to   { opacity:0; transform:translateX(30px); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Auto-remove setelah 3.5 detik
+        setTimeout(() => {
+            toastEl.style.animation = 'stafflySlideOut .25s ease forwards';
+            setTimeout(() => toastEl.remove(), 260);
+        }, 3500);
+    }
+
+    // ── Auto-show flash toast dari PHP ─────────────────────────────
+    const flashMsg = document.getElementById('stafflyFlashToast');
+    if (flashMsg) {
+        showToast(flashMsg.dataset.message || flashMsg.textContent.trim(), 'success');
+    }
+
     // Login form client-side validation
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
@@ -93,16 +149,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             $(this).remove();
                         });
                     }
-                    $('#ajaxAlertBox')
-                        .removeClass('d-none alert-danger')
-                        .addClass('alert-success')
-                        .text(res.message || 'Employee record deleted successfully.');
+                    showToast(res.message || 'Employee record deleted successfully.', 'success');
                 } else {
-                    alert(res.message || 'Failed to delete employee record.');
+                    showToast(res.message || 'Failed to delete employee record.', 'error');
                 }
             },
             error: function () {
-                alert('Server error occurred while deleting record.');
+                showToast('Server error occurred while deleting record.', 'error');
             },
             complete: function () {
                 btn.prop('disabled', false).text('Delete Record');

@@ -13,7 +13,13 @@ $email = trim($_POST['email'] ?? '');
 $jabatan = trim($_POST['jabatan'] ?? '');
 $noTelepon = trim($_POST['no_telepon'] ?? '');
 
-if ($nip === '' || $nama === '' || $email === '' || $jabatan === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+// Jika NIP kosong, otomatis generate oleh sistem
+if ($nip === '') {
+    $maxId = (int) $pdo->query("SELECT MAX(id) FROM employees")->fetchColumn();
+    $nip = date('Ymd') . str_pad((string) ($maxId + 1), 4, '0', STR_PAD_LEFT);
+}
+
+if ($nama === '' || $email === '' || $jabatan === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $_SESSION['form_error'] = 'Please fill all required fields with a valid email address.';
     header('Location: ../pegawai/tambah.php');
     exit;
